@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Blockchain Engineering in Healthcare</title>
+<meta name="description" content="A free online course: narrated 3D lessons, healthcare scenarios and hands-on labs for every chapter of Blockchain Engineering in Healthcare.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='9' width='10' height='10' rx='2' fill='%230F766E'/%3E%3Crect x='20' y='9' width='10' height='10' rx='2' fill='%230F766E'/%3E%3Cpath d='M12 14h8' stroke='%23F5B041' stroke-width='3'/%3E%3C/svg%3E">
+</head>
+<body>
+<div class="wrap stackv" style="padding-bottom:60px">
+  <header class="hero stackv">
+    <div class="eyebrow">Free online course</div>
+    <h1>Blockchain Engineering in Healthcare</h1>
+    <p class="lede">Short animated lessons in 3D, narrated by Maya, your virtual tutor. After each one you answer a quick check, decide a realistic healthcare scenario, and try a hands-on lab: hash a patient record, sign a prescription, mine a block, or race a 51% attacker.</p>
+    <div class="row"><a class="btn primary" href="ch01/index.html">Start Chapter 1 ▶</a><a class="btn" href="guide.html">New here? Read the quick guide</a></div>
+  </header>
+  <div class="heroArt" aria-hidden="true"><canvas id="hero"></canvas></div>
+  <section class="card summary" aria-label="Your course progress">
+    <div><div class="big" id="ovIdx">—</div><small class="muted">course learning index</small></div>
+    <div class="stats"><div><small>Level</small><b id="ovLvl">Not started</b></div><div><small>Chapters started</small><b id="ovStarted">0</b></div><div><small>Lessons finished</small><b id="ovLessons">0</b></div><div><small>Final tests taken</small><b id="ovTests">0</b></div></div>
+  </section>
+  <section class="how" aria-label="How each chapter works">
+    <div><b>1. Watch</b><span>About two minutes per lesson. Drag the 3D scene to look around; captions and a transcript are always there.</span></div>
+    <div><b>2. Check</b><span>One quick question, with a second chance if you need it. Say how sure you are.</span></div>
+    <div><b>3. Decide</b><span>A healthcare scenario in two steps: a patient, a hospital, a decision to make.</span></div>
+    <div><b>4. Try it</b><span>Labs use your browser's real cryptography, so what you see is what a blockchain does.</span></div>
+  </section>
+  <section class="stackv"><h2 style="font-size:1.45rem">Chapters</h2><div class="cgrid" id="grid"></div></section>
+  <p class="foot">Course by Prof Muthu Ramachandran, based on the Springer book <a href="https://link.springer.com/book/10.1007/978-981-96-4360-8">Blockchain Engineering in Healthcare</a>. Your progress is stored in this browser only; nothing is sent anywhere. Use the same browser and device to keep your record, and download a certificate from each chapter. Narration uses your device's built-in voices. 3D graphics use <a href="https://threejs.org">three.js</a> (MIT licence).</p>
+</div>
+<script type="module">
+import { Stage } from './assets/scenes.js';
+const UNITS = [
+  { id: 'ch01', num: '1', title: 'Introduction to Blockchain Concepts', blurb: 'Blocks, hashes, nodes and consensus, and why healthcare cares.' },
+  { id: 'ch02', num: '2', title: 'Core Blockchain Technologies', blurb: 'Hashing, keys, PoW and PoS, smart contracts, dApps and DeFi.' },
+  { id: 'ch03', num: '3', title: 'ICT, Blockchain, IoT, Cloud, and AI in Healthcare', blurb: 'From paper records to Smart Healthcare 5.0.' },
+  { id: 'ch04', num: '4', title: 'Blockchain Security Landscape and Classification', blurb: 'The security map, attacks, defences and trade-offs.' }
+];
+const LEVELS = [[0,'Novice'],[40,'Advanced beginner'],[60,'Competent'],[80,'Proficient']];
+const grid = document.getElementById('grid');
+const read = id => { try { return JSON.parse(localStorage.getItem('bc:' + id) || 'null'); } catch (e) { return null; } };
+let started = 0, lessons = 0, tests = 0, sum = 0;
+for (const u of UNITS) {
+  const m = (read(u.id) || {}).meta;
+  const a = document.createElement('a'); a.className = 'ch'; a.href = u.id + '/index.html';
+  a.innerHTML = `<span class="n">Chapter ${u.num}</span><b></b><span class="muted" style="font-size:.9rem"></span>`;
+  a.querySelector('b').textContent = u.title; a.querySelector('.muted').textContent = u.blurb;
+  const meta = document.createElement('div'); meta.className = 'meta';
+  if (m) {
+    started++; lessons += m.done || 0; sum += m.index || 0; if (m.test) tests++;
+    a.insertAdjacentHTML('beforeend', `<div class="bar"><i style="width:${Math.round(100 * (m.done || 0) / (m.lessons || 1))}%"></i></div>`);
+    meta.innerHTML = `<span class="pill ${m.test ? 'good' : 'acc'}">Index ${m.index || 0} · ${m.level || 'Novice'}</span><span>${m.done || 0}/${m.lessons} lessons</span>`;
+  } else meta.innerHTML = '<span class="pill acc">Start</span><span>Not started</span>';
+  a.append(meta); grid.append(a);
+}
+const soon = document.createElement('a'); soon.className = 'ch soon'; soon.innerHTML = '<span class="n">More chapters</span><b>Coming soon</b><span class="muted" style="font-size:.9rem">Further chapters of the book will be added here.</span>'; grid.append(soon);
+if (started) { const avg = Math.round(sum / started); document.getElementById('ovIdx').textContent = avg; document.getElementById('ovLvl').textContent = LEVELS.filter(l => avg >= l[0]).pop()[1]; }
+document.getElementById('ovStarted').textContent = started; document.getElementById('ovLessons').textContent = lessons; document.getElementById('ovTests').textContent = tests;
+try {
+  const st = new Stage(document.getElementById('hero'));
+  if (st.ok) { st.load({ scene: 'chain', opts: { n: 6, labels: ['Records', 'Consent', 'Pharmacy', 'Labs', 'Referrals', 'Claims'] }, say: [''] }); st.beat(0); st.fit(14.5, 2.6, 0.3, true); }
+} catch (e) { document.querySelector('.heroArt').hidden = true; }
+</script>
+</body>
+</html>
